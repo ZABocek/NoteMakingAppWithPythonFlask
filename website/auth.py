@@ -19,7 +19,7 @@ def sign_up():
         password2 = request.form.get('password2')
         
         if not re.match(r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w+$', email):
-            flash('That\'s not a proper email address!', category='error')
+            raise ValueError('That\'s not a proper email address!')
         elif len(firstName) < 2:
             flash('First name must be greater than one character.', category='error')
         elif password1 != password2:
