@@ -5,7 +5,6 @@ from os import path
 db = SQLAlchemy()
 DB_NAME = "database.db"
 
-
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'Haginghuhdochkeltwippidoo'
@@ -22,9 +21,8 @@ def create_app():
     
     with app.app_context():
         create_database()
-        
-    return app
 
+    return app
 
 def create_database():
     if not path.exists('website/' + DB_NAME):

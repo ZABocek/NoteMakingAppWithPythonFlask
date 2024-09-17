@@ -58,7 +58,8 @@ def sign_up():
         elif not validate_password(password1):
             flash('Password must be at least 10 characters and contain a special character and number.', category='error')
         else:
-            new_user = User(email=email, firstName=firstName, password=generate_password_hash(password1, method='sha256'))
+            # Correct hash method
+            new_user = User(email=email, firstName=firstName, password=generate_password_hash(password1, method='pbkdf2:sha256'))
             db.session.add(new_user)
             db.session.commit()
             flash('Account created!', category='success')
