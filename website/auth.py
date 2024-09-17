@@ -3,43 +3,21 @@ import re
 from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
-import string
 
 auth = Blueprint('auth', __name__)
 
-def generate_password(min_length, numbers=True, special_characters=True):
-    letters = string.ascii_letters
-    digits = string.digits
-    special = string.punctuation
+# New function to validate password criteria
+def validate_password(password, min_length=10, numbers=True, special_characters=True):
+    if len(password) < min_length:
+        return False
     
-    characters = letters
-    if numbers:
-        characters += digits
-    if special_characters:
-        characters += special
-        
-    pwd = ""
-    meets_criteria = False
-    has_number = False
-    has_special = False
+    if numbers and not re.search(r"\d", password):
+        return False
     
-    while not meets_criteria or len(pwd) < min_length:
-        new_char = input(characters)
-        pwd += new_char
-        
-        if new_char in digits:
-            has_number = True
-        elif new_char in special:
-            has_special = True
-            
-        meets_criteria = True
-        if numbers:
-            meets_criteria = has_number
-        if special_characters:
-            meets_criteria = meets_criteria and has_special
-            
-    return pwd
+    if special_characters and not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+        return False
     
+    return True
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -77,12 +55,12 @@ def sign_up():
             flash('First name must be greater than one character.', category='error')
         elif password1 != password2:
             flash('Passwords don\'t match.', category='error')
-        elif not generate_password(10):
+        elif not validate_password(password1):
             flash('Password must be at least 10 characters and contain a special character and number.', category='error')
         else:
             new_user = User(email=email, firstName=firstName, password=generate_password_hash(password1, method='sha256'))
             db.session.add(new_user)
-            db.session.commmit()
+            db.session.commit()
             flash('Account created!', category='success')
             return redirect(url_for('views.home'))  
     return render_template("sign_up.html")
